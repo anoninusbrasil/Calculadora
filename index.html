@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Financeiro Lavanderia Pro</title>
+    <title>Simulador Financeiro Lavanderia Pro - Turnos 24h</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -72,6 +72,9 @@
         .ml-group .ml-input { max-width: 100px; font-weight: 600; }
         .custo-ml { font-size: 0.85rem; background: var(--card-bg); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; color: var(--primary); }
 
+        .shift-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .shift-title { font-weight: 700; color: var(--primary); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
         .result-item {
             background-color: var(--card-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--border);
             margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.1s;
@@ -88,7 +91,7 @@
         .result-label { font-size: 0.9rem; color: var(--text); font-weight: 500; }
         .result-value { font-size: 1.1rem; font-weight: 700; color: var(--text); font-family: 'Inter', monospace; }
         
-        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
         .kpi-card { padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); background: white; text-align: center; box-shadow: var(--shadow-sm); }
         .kpi-card i { font-size: 1.5rem; margin-bottom: 10px; }
         .kpi-card h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
@@ -99,7 +102,17 @@
         .kpi-margem { border-bottom: 3px solid var(--primary); } .kpi-margem i, .kpi-margem h3, .kpi-margem .big-number { color: var(--primary); }
         .kpi-anual { border-bottom: 3px solid #3b82f6; } .kpi-anual i, .kpi-anual h3, .kpi-anual .big-number { color: #3b82f6; }
         .kpi-payback { border-bottom: 3px solid #8b5cf6; } .kpi-payback i, .kpi-payback h3, .kpi-payback .big-number { color: #8b5cf6; }
-        .kpi-equilibrio { border-bottom: 3px solid var(--warning); } .kpi-equilibrio i, .kpi-equilibrio h3, .kpi-equilibrio .big-number { color: var(--warning); grid-column: span 2; }
+        .kpi-bruto { border-bottom: 3px solid #f97316; } .kpi-bruto i, .kpi-bruto h3, .kpi-bruto .big-number { color: #f97316; }
+        .kpi-equilibrio { border-bottom: 3px solid var(--warning); } .kpi-equilibrio i, .kpi-equilibrio h3, .kpi-equilibrio .big-number { color: var(--warning); grid-column: span 3; }
+
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            .kpi-equilibrio { grid-column: span 1; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .ml-group { flex-direction: column; align-items: stretch; }
+            .ml-group .ml-input { max-width: none; }
+            .button-group { flex-direction: column; }
+        }
 
         .divider { border-top: 1px dashed var(--border); margin: 12px 0; }
         .alert-text { color: var(--warning); font-size: 0.8rem; margin-top: 8px; display: block; font-weight: 500; }
@@ -115,46 +128,70 @@
         .btn-reset:hover { background-color: #475569; }
         
         .chart-container { position: relative; min-height: 35vh; width: 100%; margin-top: 15px; background: white; padding: 10px; border-radius: 8px; }
-        
-        @media (max-width: 768px) {
-            .grid-2, .grid-3, .kpi-grid { grid-template-columns: 1fr; }
-            .kpi-equilibrio { grid-column: span 1; }
-            .ml-group { flex-direction: column; align-items: stretch; }
-            .ml-group .ml-input { max-width: none; }
-            .button-group { flex-direction: column; }
-        }
     </style>
 </head>
 <body>
 <div class="container" id="relatorioContainer">
-    <h1><i class="fa-solid fa-computer"></i> Simulador Financeiro Pro</h1>
-    <p class="subtitle">Análise de Viabilidade, DRE, Payback e Projeção Lavanderia Self-Service</p>
+    <h1><i class="fa-solid fa-computer"></i> Simulador Financeiro Pro - 24h</h1>
+    <p class="subtitle">Cálculo por Custos Diretos (Corrigido) | Tempos mínimos: Lavagem 30min / Secagem 40min</p>
 
+    <!-- 1. DADOS OPERACIONAIS POR TURNO -->
     <div class="card">
-        <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-sliders"></i>1. Dados da Lavagem e Custos Variáveis <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
+        <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-sliders"></i>1. Preços e Ocupação por Turno <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
-            <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLav" value="15,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSec" value="15,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Taxa Ocupação Diária (%)</label><input type="number" id="taxaOcup" value="50" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+            <div class="shift-card">
+                <div class="shift-title"><i class="fa-solid fa-sun"></i> Manhã (06h às 12h)</div>
+                <div class="grid-3">
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavManha" class="money-input text-right" value="14,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecManha" class="money-input text-right" value="14,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupManha" value="40" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                </div>
             </div>
-            <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Tempo Lavagem (min)</label><input type="number" id="tempoLav" value="35" min="1" oninput="calcularTudo()"></div>
-                <div class="form-group"><label>Tempo Secagem (min)</label><input type="number" id="tempoSec" value="45" min="1" oninput="calcularTudo()"></div>
-                <div class="form-group"><label>Tarifa Energia (R$/kWh)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="tarifaEnergia" value="1,15" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+            <div class="shift-card">
+                <div class="shift-title"><i class="fa-solid fa-cloud-sun"></i> Tarde (12h às 18h)</div>
+                <div class="grid-3">
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavTarde" class="money-input text-right" value="15,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecTarde" class="money-input text-right" value="15,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupTarde" value="60" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                </div>
             </div>
-            <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Tarifa Água (R$/m³)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="tarifaAgua" value="6,50" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Água por Lavagem (m³)</label><input type="number" id="aguaLav" value="0.150" step="0.001" min="0" oninput="calcularTudo()"></div>
-                <div class="form-group"><label>Energia Lavagem (kWh)</label><input type="number" id="energiaLav" value="0.20" step="0.01" min="0" oninput="calcularTudo()"></div>
+            <div class="shift-card">
+                <div class="shift-title"><i class="fa-solid fa-moon"></i> Noite (18h às 00h)</div>
+                <div class="grid-3">
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavNoite" class="money-input text-right" value="16,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecNoite" class="money-input text-right" value="16,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupNoite" value="50" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                </div>
             </div>
+            <div class="shift-card">
+                <div class="shift-title"><i class="fa-solid fa-owl"></i> Madrugada (00h às 06h)</div>
+                <div class="grid-3">
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavCoruja" class="money-input text-right" value="13,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecCoruja" class="money-input text-right" value="13,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupCoruja" value="10" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                </div>
+            </div>
+            <div class="divider" style="margin: 20px 0;"></div>
+
+            <!-- CUSTOS VARIÁVEIS DIRETOS (SIMPLIFICADO) -->
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Energia Secagem (kWh)</label><input type="number" id="energiaSec" value="2.50" step="0.1" min="0" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Custo Água / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoAguaCiclo" class="money-input text-right" value="1,50" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Custo Energia Lav / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoEnergiaLavCiclo" class="money-input text-right" value="0,23" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Custo Energia Sec / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoEnergiaSecCiclo" class="money-input text-right" value="2,88" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+            </div>
+
+            <div class="grid-3" style="margin-bottom: 20px;">
+                <div class="form-group"><label>Tempo Lavagem (min) - mínimo 30</label><input type="number" id="tempoLav" value="30" min="30" step="1" oninput="validarTempos(); calcularTudo()"></div>
+                <div class="form-group"><label>Tempo Secagem (min) - mínimo 40</label><input type="number" id="tempoSec" value="40" min="40" step="1" oninput="validarTempos(); calcularTudo()"></div>
+                <div class="form-group"><label>Dias Funcionamento / Mês</label><input type="number" id="diasMes" value="30" min="1" max="31" oninput="calcularTudo()"></div>
+            </div>
+            
+            <div class="grid-3" style="margin-bottom: 20px;">
                 <div class="form-group">
                     <label>Galão Sabão (R$) / Vol.</label>
                     <div class="input-group">
                         <span class="input-prefix">R$</span>
-                        <input type="text" inputmode="decimal" id="precoSabao" value="25,00" class="text-right input-compact" oninput="formatInputNumber(event); calcularTudo()">
+                        <input type="text" inputmode="decimal" id="precoSabao" class="money-input text-right input-compact" value="25,00" oninput="formatInputNumber(event); calcularTudo()">
                         <select id="volumeSabao" class="select-compact" onchange="calcularTudo()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
                     </div>
                 </div>
@@ -162,85 +199,89 @@
                     <label>Galão Amaciante (R$) / Vol.</label>
                     <div class="input-group">
                         <span class="input-prefix">R$</span>
-                        <input type="text" inputmode="decimal" id="precoAmac" value="30,00" class="text-right input-compact" oninput="formatInputNumber(event); calcularTudo()">
+                        <input type="text" inputmode="decimal" id="precoAmac" class="money-input text-right input-compact" value="30,00" oninput="formatInputNumber(event); calcularTudo()">
                         <select id="volumeAmac" class="select-compact" onchange="calcularTudo()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
                     </div>
                 </div>
+                <div class="form-group"><label>ml Químicos (Soma S+A)</label><input type="number" id="mlQuimicos" value="65" min="0" step="5" oninput="calcularTudo()"></div>
             </div>
+            
             <div class="ml-group">
-                <div class="form-group"><label>ml Sabão / Ciclo</label><input type="number" id="mlSabao" value="40" min="0" class="ml-input" oninput="calcularTudo()"></div>
-                <div class="custo-ml" id="custoSabaoMl"><i class="fa-solid fa-droplet"></i> R$ 0,00</div>
-                <div class="form-group"><label>ml Amaciante / Ciclo</label><input type="number" id="mlAmac" value="25" min="0" class="ml-input" oninput="calcularTudo()"></div>
-                <div class="custo-ml" id="custoAmacMl"><i class="fa-solid fa-droplet"></i> R$ 0,00</div>
+                <div class="custo-ml" style="flex:1; text-align:center; background: var(--card-bg);">
+                    <strong>Custo Estimado Químicos:</strong> <span id="custoQuimicosDisplay">R$ 0,00</span> / ciclo
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- 2. CAPACIDADE -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-gears"></i>2. Capacidade Operacional <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3">
                 <div class="form-group"><label>Nº de Lavadoras</label><input type="number" id="numLavadoras" value="1" min="1" oninput="validarCapacidade(); calcularTudo();"></div>
                 <div class="form-group"><label>Nº de Secadoras</label><input type="number" id="numSecadoras" value="1" min="1" oninput="validarCapacidade(); calcularTudo();"></div>
-                <div class="form-group"><label>Dias Funcionamento / Mês</label><input type="number" id="diasMes" value="30" min="1" max="31" oninput="calcularTudo()"></div>
             </div>
             <div id="alertaCapacidade" class="alert-text"></div>
         </div>
     </div>
 
-    <!-- CUSTOS FIXOS ATUALIZADO -->
+    <!-- 3. CUSTOS FIXOS E IMPOSTOS -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-file-invoice-dollar"></i>3. Custos Fixos e Impostos <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Aluguel</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="aluguel" value="2.500,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Internet + Sistema</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="internet" value="150,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Câmeras / Segurança</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="seguranca" value="200,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Aluguel</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="aluguel" class="money-input text-right" value="2.500,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Internet + Sistema</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="internet" class="money-input text-right" value="150,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Câmeras / Segurança</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="seguranca" class="money-input text-right" value="200,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
             </div>
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Energia Ar-Cond. 24h</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="arCond" value="600,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Manutenção / Outros</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="manutencao" value="300,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Impostos (% Faturamento)</label><input type="number" id="impostos" value="8" step="0.5" min="0" max="100" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Energia Ar-Cond. 24h</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="arCond" class="money-input text-right" value="600,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Manutenção / Outros</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="manutencao" class="money-input text-right" value="300,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Impostos (%)</label><input type="number" id="impostos" value="8" step="0.5" min="0" max="100" oninput="calcularTudo()"></div>
             </div>
-            <!-- NOVOS CAMPOS ADICIONADOS AQUI -->
             <div class="grid-2">
-                <div class="form-group"><label>Contador (Mensalidade ME/Simples)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="contador" value="350,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Sistemas e Software do Totem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="softwareTotem" value="300,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Contador</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="contador" class="money-input text-right" value="350,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Software Totem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="softwareTotem" class="money-input text-right" value="300,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
             </div>
         </div>
     </div>
 
+    <!-- 4. DEPRECIAÇÃO -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-clock-rotate-left"></i>4. Depreciação <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-2">
-                <div class="form-group"><label>Valor Total Máquinas</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorMaquinas" value="50.000,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Valor Máquinas</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorMaquinas" class="money-input text-right" value="50.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
                 <div class="form-group"><label>Vida Útil (meses)</label><input type="number" id="vidaUtil" value="120" step="12" min="1" oninput="calcularTudo()"></div>
             </div>
         </div>
     </div>
 
+    <!-- 5. FINANCIAMENTO -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-landmark"></i>5. Financiamento <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3">
-                <div class="form-group"><label>Valor Financiado</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorFinanciado" value="0,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Valor Financiado</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorFinanciado" class="money-input text-right" value="0,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
                 <div class="form-group"><label>Taxa Juros Mensal (%)</label><input type="number" id="taxaJuros" value="1.5" step="0.1" min="0" oninput="calcularTudo()"></div>
                 <div class="form-group"><label>Nº Parcelas</label><input type="number" id="numParcelas" value="24" step="1" min="1" oninput="calcularTudo()"></div>
             </div>
         </div>
     </div>
 
+    <!-- 6. INVESTIMENTO INICIAL -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-piggy-bank"></i>6. Investimento Inicial <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-2">
-                <div class="form-group"><label>Investimento Total (Obras + Equip)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="investimentoInicial" value="80.000,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Valor Residual (Venda ao final)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorResidual" value="20.000,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Investimento Total</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="investimentoInicial" class="money-input text-right" value="80.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Valor Residual</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorResidual" class="money-input text-right" value="20.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
             </div>
         </div>
     </div>
 
+    <!-- 7. DRE -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-chart-line"></i>7. DRE - Demonstrativo Mensal <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
@@ -250,28 +291,31 @@
             <div class="divider"></div>
             <div class="result-item warning"><span class="result-label">(-) Impostos</span><span class="result-value warning-text" id="impostosMes">R$ 0,00</span></div>
             <div class="result-item cost"><span class="result-label">(-) Custos Fixos</span><span class="result-value cost-text" id="custosFixosMes">R$ 0,00</span></div>
-            <div class="result-item profit" style="border-left-width: 5px;"><span class="result-label" style="font-weight:700;">(=) Lucro Operacional (Saúde do Negócio)</span><span class="result-value profit-text" id="lucroOperacionalMes">R$ 0,00</span></div>
+            <div class="result-item profit" style="border-left-width: 5px;"><span class="result-label" style="font-weight:700;">(=) Lucro Operacional</span><span class="result-value profit-text" id="lucroOperacionalMes">R$ 0,00</span></div>
             <div class="divider"></div>
-            <div class="result-item cost"><span class="result-label">(-) Depreciação (Reserva p/ troca de máquinas)</span><span class="result-value cost-text" id="depreciacaoMes">R$ 0,00</span></div>
-            <div class="result-item cost" style="border-left-color: #b91c1c;"><span class="result-label">(-) Parcela do Financiamento</span><span class="result-value cost-text" id="parcelaFinanciamentoDRE">R$ 0,00</span></div>
+            <div class="result-item cost"><span class="result-label">(-) Depreciação</span><span class="result-value cost-text" id="depreciacaoMes">R$ 0,00</span></div>
+            <div class="result-item cost" style="border-left-color: #b91c1c;"><span class="result-label">(-) Parcela Financiamento</span><span class="result-value cost-text" id="parcelaFinanciamentoDRE">R$ 0,00</span></div>
             <div class="result-item profit" style="border-left-width: 5px;"><span class="result-label" style="font-weight:700;">(=) Lucro Líquido Contábil</span><span class="result-value profit-text" id="lucroLiquidoMes">R$ 0,00</span></div>
             <div class="divider"></div>
-            <div class="result-item profit"><span class="result-label">(+) Depreciação (Não é saída de caixa)</span><span class="result-value profit-text" id="depAdd">R$ 0,00</span></div>
+            <div class="result-item profit"><span class="result-label">(+) Depreciação (Add Back)</span><span class="result-value profit-text" id="depAdd">R$ 0,00</span></div>
             <div class="result-item real-cash">
-                <span class="result-label"><i class="fa-solid fa-money-bill-trend-up"></i> SALDO DE CAIXA LÍQUIDO (Lucro Real no Banco)</span>
+                <span class="result-label"><i class="fa-solid fa-money-bill-trend-up"></i> SALDO DE CAIXA LÍQUIDO</span>
                 <span class="result-value" id="saldoCaixaReal">R$ 0,00</span>
             </div>
         </div>
     </div>
 
+    <!-- KPI CARDS -->
     <div class="kpi-grid">
         <div class="kpi-card kpi-lucro"><i class="fa-solid fa-coins"></i><h3>Lucro Real (Caixa)</h3><div class="big-number" id="lucroLiquidoMesDestaque">R$ 0</div></div>
         <div class="kpi-card kpi-margem"><i class="fa-solid fa-percent"></i><h3>Margem Líquida</h3><div class="big-number" id="margemLiquida">0%</div></div>
         <div class="kpi-card kpi-anual"><i class="fa-solid fa-calendar-check"></i><h3>Lucro Real Anual</h3><div class="big-number" id="lucroLiquidoAnual">R$ 0</div></div>
-        <div class="kpi-card kpi-payback"><i class="fa-solid fa-hourglass-half"></i><h3>Payback (Retorno)</h3><div class="big-number" id="paybackMeses">0 meses</div><p>Tempo para recuperar o investimento</p></div>
-        <div class="kpi-card kpi-equilibrio"><i class="fa-solid fa-scale-balanced"></i><h3>Ponto de Equilíbrio</h3><div class="big-number" id="pontoEquilibrio">0 ciclos/dia</div><p>Ciclos completos (Lav+Sec) para não ter prejuízo</p></div>
+        <div class="kpi-card kpi-payback"><i class="fa-solid fa-hourglass-half"></i><h3>Payback</h3><div class="big-number" id="paybackMeses">0 meses</div><p>Tempo para retorno</p></div>
+        <div class="kpi-card kpi-bruto"><i class="fa-solid fa-chart-simple"></i><h3>Lucro Bruto Anual</h3><div class="big-number" id="lucroBrutoAnual">R$ 0</div></div>
+        <div class="kpi-card kpi-equilibrio"><i class="fa-solid fa-scale-balanced"></i><h3>Ponto de Equilíbrio</h3><div class="big-number" id="pontoEquilibrio">0 ciclos/dia</div><p>Ciclos para zerar</p></div>
     </div>
 
+    <!-- 8. GRÁFICOS -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-chart-pie"></i>8. Dashboard Visual <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
@@ -294,163 +338,254 @@
     let collapsedStates = [];
 
     const defaultValues = {
-        precoLav:'15,00', precoSec:'15,00', taxaOcup:50, tempoLav:35, tempoSec:45, tarifaEnergia:'1,15',
-        tarifaAgua:'6,50', aguaLav:0.150, energiaLav:0.20, energiaSec:2.50, precoSabao:'25,00', volumeSabao:'7',
-        precoAmac:'30,00', volumeAmac:'7', mlSabao:40, mlAmac:25, numLavadoras:1, numSecadoras:1,
-        diasMes:30, aluguel:'2.500,00', internet:'150,00', seguranca:'200,00', arCond:'600,00', manutencao:'300,00',
-        impostos:8, contador:'350,00', softwareTotem:'300,00', valorMaquinas:'50.000,00', vidaUtil:120, 
-        valorFinanciado:'0,00', taxaJuros:1.5, numParcelas:24, investimentoInicial:'80.000,00', valorResidual:'20.000,00'
+        precoLavManha:'14,00', precoSecManha:'14,00', ocupManha:40,
+        precoLavTarde:'15,00', precoSecTarde:'15,00', ocupTarde:60,
+        precoLavNoite:'16,00', precoSecNoite:'16,00', ocupNoite:50,
+        precoLavCoruja:'13,00', precoSecCoruja:'13,00', ocupCoruja:10,
+        custoAguaCiclo:'1,50', custoEnergiaLavCiclo:'0,23', custoEnergiaSecCiclo:'2,88',
+        tempoLav:30, tempoSec:40, diasMes:30,
+        precoSabao:'25,00', volumeSabao:'7', precoAmac:'30,00', volumeAmac:'7', mlQuimicos:65,
+        numLavadoras:1, numSecadoras:1, 
+        aluguel:'2.500,00', internet:'150,00', seguranca:'200,00', 
+        arCond:'600,00', manutencao:'300,00', impostos:8, contador:'350,00', softwareTotem:'300,00', 
+        valorMaquinas:'50.000,00', vidaUtil:120, valorFinanciado:'0,00', taxaJuros:1.5, numParcelas:24, 
+        investimentoInicial:'80.000,00', valorResidual:'20.000,00'
     };
     const inputIds = Object.keys(defaultValues);
 
     function formatInputNumber(event) {
-        let input = event.target;
+        let input = event.target; 
+        input.value = input.value.replace('.', ',');
         let value = input.value;
         value = value.replace(/[^\d,]/g, '');
         let parts = value.split(',');
-        if (parts.length > 2) value = parts[0] + ',' + parts.slice(1).join('');
+        if (parts.length > 2) {
+            value = parts[0] + ',' + parts.slice(1).join('');
+            parts = value.split(',');
+        }
         let intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         input.value = parts.length === 2 ? intPart + ',' + parts[1] : intPart;
+        if (event.type !== 'reset') calcularTudo();
     }
 
-    function salvarDados() {
-        try {
-            const dados = {};
-            inputIds.forEach(id => { const el = document.getElementById(id); if (el) dados[id] = el.value; });
-            localStorage.setItem('simuladorLavanderiaPro', JSON.stringify(dados));
-        } catch (e) {}
-    }
-
-    function carregarDados() {
-        try {
-            const dadosSalvos = localStorage.getItem('simuladorLavanderiaPro');
-            if (dadosSalvos) {
-                const dados = JSON.parse(dadosSalvos);
-                inputIds.forEach(id => { const el = document.getElementById(id); if (el && dados[id] !== undefined) el.value = dados[id]; });
-            }
-        } catch (e) {}
-    }
-
-    function resetarPadrao() {
-        inputIds.forEach(id => { 
-            const el = document.getElementById(id); 
-            if (el && defaultValues[id] !== undefined) {
-                el.value = defaultValues[id];
-                if (el.type === 'text') formatInputNumber({ target: el });
+    function formatAllMoneyInputs() {
+        document.querySelectorAll('.money-input').forEach(input => {
+            if (input.value) {
+                input.value = input.value.replace('.', ','); 
+                formatInputNumber({ target: input, type: 'load' });
             }
         });
-        calcularTudo(); salvarDados();
     }
 
-    function getValor(id, defaultValue = 0) {
-        const el = document.getElementById(id);
-        if (!el) return defaultValue;
-        
-        let valStr = el.value;
-        let v;
+    function validarTempos() {
+        let tempoLav = parseInt(document.getElementById('tempoLav').value);
+        let tempoSec = parseInt(document.getElementById('tempoSec').value);
+        if (tempoLav < 30) document.getElementById('tempoLav').value = 30;
+        if (tempoSec < 40) document.getElementById('tempoSec').value = 40;
+    }
 
-        if (el.type === 'text') {
-            valStr = valStr.replace(/\./g, ''); 
-            valStr = valStr.replace(',', '.');   
-        } 
+    function salvarDados() { 
+        try { 
+            const dados = {}; 
+            inputIds.forEach(id => { 
+                const el = document.getElementById(id); 
+                if (el) dados[id] = el.value; 
+            }); 
+            localStorage.setItem('simuladorLavProV2', JSON.stringify(dados)); 
+        } catch (e) {} 
+    }
+
+    function carregarDados() { 
+        try { 
+            const d = localStorage.getItem('simuladorLavProV2'); 
+            if (d) { 
+                const dados = JSON.parse(d); 
+                inputIds.forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if (el && dados[id] !== undefined) el.value = dados[id]; 
+                }); 
+                formatAllMoneyInputs();
+            } else {
+                formatAllMoneyInputs();
+            }
+        } catch (e) {} 
+    }
+
+    function resetarPadrao() { 
+        inputIds.forEach(id => { 
+            const el = document.getElementById(id); 
+            if (el && defaultValues[id] !== undefined) el.value = defaultValues[id]; 
+        }); 
+        formatAllMoneyInputs();
+        calcularTudo(); 
+        salvarDados(); 
+    }
+
+    // FUNÇÃO CORRIGIDA DE LEITURA DE VALORES
+    function getValor(id, defaultValue = 0) {
+        const el = document.getElementById(id); 
+        if (!el) return defaultValue;
+        let valStr = el.value.trim();
         
-        v = parseFloat(valStr);
+        // Se for um campo monetário (texto), removemos pontos de milhar e trocamos vírgula por ponto
+        if (el.classList.contains('money-input')) {
+            valStr = valStr.replace(/\./g, '').replace(',', '.');
+        } else {
+            // Se for um campo numérico comum (taxa juros, quantidade, etc)
+            // Trocamos vírgula por ponto (caso usuário use vírgula decimal)
+            // NÃO removemos pontos, pois podem ser decimais (ex: 1.5% de juros)
+            valStr = valStr.replace(',', '.');
+        }
+        
+        let v = parseFloat(valStr);
         return (isNaN(v) || v < 0) ? defaultValue : v;
     }
 
-    function formatCurrency(value) {
-        if (isNaN(value)) return "R$ 0,00";
-        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    function formatCurrency(value) { 
+        if (isNaN(value) || !isFinite(value)) return "R$ 0,00"; 
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); 
     }
 
-    function calcularParcelaFinanciamento(valor, taxaMensal, numParcelas) {
-        if (valor <= 0 || numParcelas <= 0) return 0;
-        if (taxaMensal <= 0) return valor / numParcelas;
-        const i = taxaMensal / 100;
-        return valor * (i * Math.pow(1 + i, numParcelas)) / (Math.pow(1 + i, numParcelas) - 1);
+    function calcularParcelaFinanciamento(valor, taxaMensal, numParcelas) { 
+        if (valor <= 0 || numParcelas <= 0) return 0; 
+        if (taxaMensal <= 0) return valor / numParcelas; 
+        
+        // Fórmula Price: PMT = P * [ i(1+i)^n ] / [ (1+i)^n – 1 ]
+        const i = taxaMensal / 100; 
+        return valor * (i * Math.pow(1 + i, numParcelas)) / (Math.pow(1 + i, numParcelas) - 1); 
     }
 
-    function validarCapacidade() {
-        const lav = getValor('numLavadoras', 1); const sec = getValor('numSecadoras', 1);
-        document.getElementById('alertaCapacidade').innerHTML = sec < lav ? "<i class='fa-solid fa-triangle-exclamation'></i> Atenção: Mais lavadoras que secadoras pode gerar filas." : "";
+    function validarCapacidade() { 
+        const lav = getValor('numLavadoras', 1); 
+        const sec = getValor('numSecadoras', 1); 
+        document.getElementById('alertaCapacidade').innerHTML = sec < lav ? "<i class='fa-solid fa-triangle-exclamation'></i> Atenção: Mais lavadoras que secadoras pode gerar filas." : ""; 
     }
 
     let chartCustos, chartReceita, chartProjecao;
     if (typeof Chart !== 'undefined') {
         Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.color = '#64748b';
         const ctxCustos = document.getElementById('chartCustos')?.getContext('2d');
-        if(ctxCustos) chartCustos = new Chart(ctxCustos, { type: 'doughnut', data: { labels: ['Custos Variáveis', 'Impostos', 'Custos Fixos', 'Depreciação', 'Financiamento'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#ef4444', '#f59e0b', '#f97316', '#8b5cf6', '#ec4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Composição dos Custos + Financiamento', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}` } } } } });
+        if(ctxCustos) chartCustos = new Chart(ctxCustos, { type: 'doughnut', data: { labels: ['Custos Variáveis', 'Impostos', 'Custos Fixos', 'Depreciação', 'Financiamento'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#ef4444', '#f59e0b', '#f97316', '#8b5cf6', '#ec4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Composição dos Custos', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}` } } } } });
         const ctxReceita = document.getElementById('chartReceita')?.getContext('2d');
-        if(ctxReceita) chartReceita = new Chart(ctxReceita, { type: 'bar', data: { labels: ['Receita', 'Custos Totais', 'Lucro Real (Caixa)'], datasets: [{ label: 'R$', data: [0,0,0], backgroundColor: ['#3b82f6', '#ef4444', '#059669'], borderRadius: 6, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (val) => formatCurrency(val) } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, title: { display: true, text: 'Fluxo Mensal (R$)', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } } } });
+        if(ctxReceita) chartReceita = new Chart(ctxReceita, { type: 'bar', data: { labels: ['Receita', 'Custos Totais', 'Lucro Real'], datasets: [{ label: 'R$', data: [0,0,0], backgroundColor: ['#3b82f6', '#ef4444', '#059669'], borderRadius: 6, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (val) => formatCurrency(val) } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, title: { display: true, text: 'Fluxo Mensal (R$)', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } } } });
         const ctxProjecao = document.getElementById('chartProjecao')?.getContext('2d');
-        if(ctxProjecao) chartProjecao = new Chart(ctxProjecao, { type: 'line', data: { labels: ['Mês 1','2','3','4','5','6','7','8','9','10','11','12'], datasets: [{ label: 'Caixa Acumulado', data: [0,0,0,0,0,0,0,0,0,0,0,0], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: (val) => formatCurrency(val) } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, title: { display: true, text: 'Projeção de Caixa Acumulado (12 meses)', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } } } });
+        if(ctxProjecao) chartProjecao = new Chart(ctxProjecao, { type: 'line', data: { labels: ['Mês 1','2','3','4','5','6','7','8','9','10','11','12'], datasets: [{ label: 'Caixa Acumulado', data: [0,0,0,0,0,0,0,0,0,0,0,0], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: (val) => formatCurrency(val) } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, title: { display: true, text: 'Projeção de Caixa Acumulado', font: { size: 16, weight: 'bold' } }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } } } });
     }
 
-    function atualizarCustosMl() {
-        const precoSabao = getValor('precoSabao'); const volumeSabaoLitros = parseFloat(document.getElementById('volumeSabao')?.value) || 7; const mlSabao = getValor('mlSabao');
-        document.getElementById('custoSabaoMl').innerHTML = `<i class="fa-solid fa-droplet"></i> Sabão: ${formatCurrency((precoSabao / (volumeSabaoLitros * 1000)) * mlSabao)}`;
-        const precoAmac = getValor('precoAmac'); const volumeAmacLitros = parseFloat(document.getElementById('volumeAmac')?.value) || 7; const mlAmac = getValor('mlAmac');
-        document.getElementById('custoAmacMl').innerHTML = `<i class="fa-solid fa-droplet"></i> Amaciante: ${formatCurrency((precoAmac / (volumeAmacLitros * 1000)) * mlAmac)}`;
+    function atualizarCustosQuimicos() {
+        const precoSabao = getValor('precoSabao'); 
+        const volumeSabaoLitros = parseFloat(document.getElementById('volumeSabao')?.value) || 7; 
+        const precoAmac = getValor('precoAmac'); 
+        const volumeAmacLitros = parseFloat(document.getElementById('volumeAmac')?.value) || 7; 
+        const mlQuimicos = getValor('mlQuimicos');
+
+        const custoSabaoPorMl = precoSabao / (volumeSabaoLitros * 1000); 
+        const custoAmacPorMl = precoAmac / (volumeAmacLitros * 1000);
+        const custoMedioMl = (custoSabaoPorMl + custoAmacPorMl) / 2;
+        const custoQuimicosCiclo = mlQuimicos * custoMedioMl;
+        
+        document.getElementById('custoQuimicosDisplay').innerText = formatCurrency(custoQuimicosCiclo);
+        return custoQuimicosCiclo;
     }
 
     function calcularTudo() {
         try {
-            atualizarCustosMl();
+            validarTempos();
+            const custoQuimicosCiclo = atualizarCustosQuimicos();
             
-            const precoLav = getValor('precoLav'); const precoSec = getValor('precoSec');
-            let taxaOcup = getValor('taxaOcup', 50) / 100; taxaOcup = Math.min(taxaOcup, 1);
-            const tempoLav = getValor('tempoLav', 35); const tempoSec = getValor('tempoSec', 45);
-            const tarifaEnergia = getValor('tarifaEnergia'); const tarifaAgua = getValor('tarifaAgua');
-            const aguaLav = getValor('aguaLav'); const energiaLav = getValor('energiaLav'); const energiaSec = getValor('energiaSec');
-            const precoSabao = getValor('precoSabao'); const volumeSabaoLitros = parseFloat(document.getElementById('volumeSabao')?.value) || 7;
-            const precoAmac = getValor('precoAmac'); const volumeAmacLitros = parseFloat(document.getElementById('volumeAmac')?.value) || 7;
-            const mlSabao = getValor('mlSabao'); const mlAmac = getValor('mlAmac');
-            const custoSabaoPorMl = precoSabao / (volumeSabaoLitros * 1000); const custoAmacPorMl = precoAmac / (volumeAmacLitros * 1000);
-            const numLavadoras = getValor('numLavadoras', 1); const numSecadoras = getValor('numSecadoras', 1); const diasMes = getValor('diasMes', 30);
-            const aluguel = getValor('aluguel'); const internet = getValor('internet'); const seguranca = getValor('seguranca');
-            const arCond = getValor('arCond'); const manutencao = getValor('manutencao');
-            let impostosPerc = getValor('impostos', 8) / 100; impostosPerc = Math.min(impostosPerc, 1);
-            // NOVOS CUSTOS FIXOS LIDOS AQUI
-            const contador = getValor('contador'); const softwareTotem = getValor('softwareTotem');
+            const tempoLav = Math.max(30, getValor('tempoLav', 30));
+            const tempoSec = Math.max(40, getValor('tempoSec', 40));
             
-            const valorMaquinas = getValor('valorMaquinas'); const vidaUtil = getValor('vidaUtil', 120);
-            const depreciacaoMensal = vidaUtil > 0 ? valorMaquinas / vidaUtil : 0;
-            const valorFinanciado = getValor('valorFinanciado'); const taxaJuros = getValor('taxaJuros'); const numParcelas = getValor('numParcelas', 1);
-            const parcelaFinanc = calcularParcelaFinanciamento(valorFinanciado, taxaJuros, numParcelas);
-            const investimentoInicial = getValor('investimentoInicial'); const valorResidual = getValor('valorResidual');
+            const custoAguaCiclo = getValor('custoAguaCiclo');
+            const custoEnergiaLavCiclo = getValor('custoEnergiaLavCiclo');
+            const custoEnergiaSecCiclo = getValor('custoEnergiaSecCiclo');
+            
+            const custoTotalLavCiclo = custoAguaCiclo + custoEnergiaLavCiclo + custoQuimicosCiclo;
+            const custoTotalSecCiclo = custoEnergiaSecCiclo;
 
-            const custoTotalLavCiclo = (aguaLav * tarifaAgua) + (energiaLav * tarifaEnergia) + (mlSabao * custoSabaoPorMl) + (mlAmac * custoAmacPorMl);
-            const custoTotalSecCiclo = energiaSec * tarifaEnergia;
+            const numLavadoras = getValor('numLavadoras', 1); 
+            const numSecadoras = getValor('numSecadoras', 1); 
+            const diasMes = getValor('diasMes', 30);
+            
+            const shifts = [
+                { name: "Manhã", duration: 360, lavPrice: getValor('precoLavManha'), secPrice: getValor('precoSecManha'), occupancy: getValor('ocupManha', 40)/100 },
+                { name: "Tarde", duration: 360, lavPrice: getValor('precoLavTarde'), secPrice: getValor('precoSecTarde'), occupancy: getValor('ocupTarde', 60)/100 },
+                { name: "Noite", duration: 360, lavPrice: getValor('precoLavNoite'), secPrice: getValor('precoSecNoite'), occupancy: getValor('ocupNoite', 50)/100 },
+                { name: "Madrugada", duration: 360, lavPrice: getValor('precoLavCoruja'), secPrice: getValor('precoSecCoruja'), occupancy: getValor('ocupCoruja', 10)/100 }
+            ];
 
-            const minutosDia = 24 * 60;
-            const totalCiclosLavDia = ((minutosDia / tempoLav) * taxaOcup) * numLavadoras;
-            const totalCiclosSecDia = ((minutosDia / tempoSec) * taxaOcup) * numSecadoras;
-            const receitaDiaTotal = (totalCiclosLavDia * precoLav) + (totalCiclosSecDia * precoSec);
-            const custoVarDiaTotal = (totalCiclosLavDia * custoTotalLavCiclo) + (totalCiclosSecDia * custoTotalSecCiclo);
+            let receitaDiaTotal = 0; 
+            let custoVarDiaTotal = 0;
+            let totalCiclosLavDia = 0; 
+            let totalCiclosSecDia = 0;
+            let somaPonderadaPrecoLav = 0; 
+            let somaPonderadaPrecoSec = 0;
+
+            shifts.forEach(shift => {
+                let ciclosLav = ((shift.duration / tempoLav) * shift.occupancy) * numLavadoras;
+                let ciclosSec = ((shift.duration / tempoSec) * shift.occupancy) * numSecadoras;
+                
+                ciclosLav = isNaN(ciclosLav) ? 0 : ciclosLav;
+                ciclosSec = isNaN(ciclosSec) ? 0 : ciclosSec;
+
+                receitaDiaTotal += (ciclosLav * shift.lavPrice) + (ciclosSec * shift.secPrice);
+                custoVarDiaTotal += (ciclosLav * custoTotalLavCiclo) + (ciclosSec * custoTotalSecCiclo);
+                
+                totalCiclosLavDia += ciclosLav;
+                totalCiclosSecDia += ciclosSec;
+                somaPonderadaPrecoLav += (ciclosLav * shift.lavPrice);
+                somaPonderadaPrecoSec += (ciclosSec * shift.secPrice);
+            });
+
+            const precoMedioLav = totalCiclosLavDia > 0 ? somaPonderadaPrecoLav / totalCiclosLavDia : 0;
+            const precoMedioSec = totalCiclosSecDia > 0 ? somaPonderadaPrecoSec / totalCiclosSecDia : 0;
 
             const receitaMes = receitaDiaTotal * diasMes;
             const custoVarMes = custoVarDiaTotal * diasMes;
             const lucroBrutoMes = receitaMes - custoVarMes;
-            const impostosMes = receitaMes * impostosPerc;
-            // ADICIONADOS CONTADOR E SOFTWARE TOTEM AQUI
+            const lucroBrutoAnual = lucroBrutoMes * 12;
+            
+            const aluguel = getValor('aluguel'); 
+            const internet = getValor('internet'); 
+            const seguranca = getValor('seguranca');
+            const arCond = getValor('arCond'); 
+            const manutencao = getValor('manutencao'); 
+            const contador = getValor('contador'); 
+            const softwareTotem = getValor('softwareTotem');
             const custosFixosMes = aluguel + internet + seguranca + arCond + manutencao + contador + softwareTotem;
             
+            let impostosPerc = getValor('impostos', 8) / 100; 
+            impostosPerc = Math.min(impostosPerc, 1);
+            const impostosMes = receitaMes * impostosPerc;
             const lucroOperacionalMes = lucroBrutoMes - impostosMes - custosFixosMes;
+            
+            const valorMaquinas = getValor('valorMaquinas'); 
+            const vidaUtil = getValor('vidaUtil', 120);
+            const depreciacaoMensal = vidaUtil > 0 ? valorMaquinas / vidaUtil : 0;
+            const valorFinanciado = getValor('valorFinanciado'); 
+            const taxaJuros = getValor('taxaJuros'); 
+            const numParcelas = getValor('numParcelas', 1);
+            const parcelaFinanc = calcularParcelaFinanciamento(valorFinanciado, taxaJuros, numParcelas);
             const lucroLiquidoMes = lucroOperacionalMes - depreciacaoMensal - parcelaFinanc;
             const saldoCaixaReal = lucroLiquidoMes + depreciacaoMensal;
-            
             const lucroLiquidoAnual = saldoCaixaReal * 12;
             const margemLiquida = receitaMes > 0 ? (saldoCaixaReal / receitaMes * 100) : 0;
 
+            const investimentoInicial = getValor('investimentoInicial'); 
+            const valorResidual = getValor('valorResidual');
             const investimentoLiquido = investimentoInicial - valorResidual;
             let paybackMeses = (saldoCaixaReal > 0 && investimentoLiquido > 0) ? investimentoLiquido / saldoCaixaReal : Infinity;
             if (investimentoLiquido <= 0) paybackMeses = 0;
 
-            const margemContribDiariaPorCiclo = (precoLav + precoSec) * (1 - impostosPerc) - (custoTotalLavCiclo + custoTotalSecCiclo);
+            const margemContribDiariaPorCiclo = (precoMedioLav + precoMedioSec) * (1 - impostosPerc) - (custoTotalLavCiclo + custoTotalSecCiclo);
             const custosFixosDiarios = (custosFixosMes + depreciacaoMensal + parcelaFinanc) / diasMes;
             let pontoEquilibrioExibicao = "";
-            if (margemContribDiariaPorCiclo <= 0) pontoEquilibrioExibicao = "Preço não cobre custos variáveis";
-            else { let ciclos = custosFixosDiarios / margemContribDiariaPorCiclo; pontoEquilibrioExibicao = (ciclos > 0 && isFinite(ciclos)) ? Math.ceil(ciclos) + " ciclos/dia" : "> 1000 ciclos/dia"; }
+            if (margemContribDiariaPorCiclo <= 0 || isNaN(margemContribDiariaPorCiclo)) {
+                pontoEquilibrioExibicao = `Preço médio não cobre custos variáveis`;
+            } else {
+                let ciclos = custosFixosDiarios / margemContribDiariaPorCiclo;
+                pontoEquilibrioExibicao = (ciclos > 0 && isFinite(ciclos)) ? Math.ceil(ciclos) + " ciclos/dia" : "> 1000 ciclos/dia";
+            }
 
             let acumulado = 0; const projecao = [];
             for (let i = 1; i <= 12; i++) { acumulado += saldoCaixaReal; projecao.push(acumulado); }
@@ -466,15 +601,15 @@
             document.getElementById('lucroLiquidoMes').innerText = formatCurrency(lucroLiquidoMes);
             document.getElementById('depAdd').innerHTML = "+ " + formatCurrency(depreciacaoMensal);
             document.getElementById('saldoCaixaReal').innerText = formatCurrency(saldoCaixaReal);
-            
             document.getElementById('lucroLiquidoMesDestaque').innerText = formatCurrency(saldoCaixaReal);
             document.getElementById('lucroLiquidoAnual').innerText = formatCurrency(lucroLiquidoAnual);
             document.getElementById('margemLiquida').innerText = margemLiquida.toFixed(1) + "%";
             document.getElementById('paybackMeses').innerText = (paybackMeses === Infinity || !isFinite(paybackMeses)) ? "Inviável" : Math.ceil(paybackMeses) + " meses";
             document.getElementById('pontoEquilibrio').innerHTML = pontoEquilibrioExibicao;
+            document.getElementById('lucroBrutoAnual').innerText = formatCurrency(lucroBrutoAnual);
 
             if (chartCustos) { chartCustos.data.datasets[0].data = [custoVarMes, impostosMes, custosFixosMes, depreciacaoMensal, parcelaFinanc]; chartCustos.update(); }
-            if (chartReceita) { const custoTotalGeral = custoVarMes + impostosMes + custosFixosMes + depreciacaoMensal + parcelaFinanc; chartReceita.data.datasets[0].data = [receitaMes, custoTotalGeral, saldoCaixaReal > 0 ? saldoCaixaReal : 0]; chartReceita.update(); }
+            if (chartReceita) { const ct = custoVarMes + impostosMes + custosFixosMes + depreciacaoMensal + parcelaFinanc; chartReceita.data.datasets[0].data = [receitaMes, ct, saldoCaixaReal > 0 ? saldoCaixaReal : 0]; chartReceita.update(); }
             if (chartProjecao) { chartProjecao.data.datasets[0].data = projecao; chartProjecao.update(); }
 
             validarCapacidade(); salvarDados();
@@ -505,7 +640,8 @@
     document.getElementById('btnExportarPDF').addEventListener('click', exportarPDF);
     document.getElementById('btnReset').addEventListener('click', resetarPadrao);
     
-    carregarDados(); calcularTudo();
+    carregarDados(); 
+    setTimeout(calcularTudo, 100);
 </script>
 </body>
 </html>
