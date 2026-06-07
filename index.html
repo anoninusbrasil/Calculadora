@@ -133,7 +133,7 @@
 <body>
 <div class="container" id="relatorioContainer">
     <h1><i class="fa-solid fa-computer"></i> Simulador Financeiro Pro - 24h</h1>
-    <p class="subtitle">Cálculo por Custos Diretos | Formatação Automática BRL</p>
+    <p class="subtitle">Cálculo por Custos Diretos | Entrada Manual</p>
 
     <!-- 1. DADOS OPERACIONAIS POR TURNO -->
     <div class="card">
@@ -142,48 +142,48 @@
             <div class="shift-card">
                 <div class="shift-title"><i class="fa-solid fa-sun"></i> Manhã (06h às 12h)</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavManha" class="money-input text-right" value="14,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecManha" class="money-input text-right" value="14,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupManha" value="40" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoLavManha" class="text-right" value="14,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoSecManha" class="text-right" value="14,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupManha" value="40" step="5" min="0" max="100" oninput="calcularTutto()"></div>
                 </div>
             </div>
             <div class="shift-card">
                 <div class="shift-title"><i class="fa-solid fa-cloud-sun"></i> Tarde (12h às 18h)</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavTarde" class="money-input text-right" value="15,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecTarde" class="money-input text-right" value="15,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupTarde" value="60" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoLavTarde" class="text-right" value="15,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoSecTarde" class="text-right" value="15,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupTarde" value="60" step="5" min="0" max="100" oninput="calcularTutto()"></div>
                 </div>
             </div>
             <div class="shift-card">
                 <div class="shift-title"><i class="fa-solid fa-moon"></i> Noite (18h às 00h)</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavNoite" class="money-input text-right" value="16,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecNoite" class="money-input text-right" value="16,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupNoite" value="50" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoLavNoite" class="text-right" value="16,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoSecNoite" class="text-right" value="16,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupNoite" value="50" step="5" min="0" max="100" oninput="calcularTutto()"></div>
                 </div>
             </div>
             <div class="shift-card">
                 <div class="shift-title"><i class="fa-solid fa-owl"></i> Madrugada (00h às 06h)</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoLavCoruja" class="money-input text-right" value="13,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="precoSecCoruja" class="money-input text-right" value="13,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupCoruja" value="10" step="5" min="0" max="100" oninput="calcularTudo()"></div>
+                    <div class="form-group"><label>Preço Lavagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoLavCoruja" class="text-right" value="13,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Preço Secagem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoSecCoruja" class="text-right" value="13,00" oninput="calcularTutto()"></div></div>
+                    <div class="form-group"><label>Ocupação Turno (%)</label><input type="number" id="ocupCoruja" value="10" step="5" min="0" max="100" oninput="calcularTutto()"></div>
                 </div>
             </div>
             <div class="divider" style="margin: 20px 0;"></div>
 
-            <!-- CUSTOS VARIÁVEIS DIRETOS (SIMPLIFICADO) -->
+            <!-- CUSTOS VARIÁVEIS DIRETOS -->
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Custo Água / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoAguaCiclo" class="money-input text-right" value="1,50" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Custo Energia Lav / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoEnergiaLavCiclo" class="money-input text-right" value="0,23" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Custo Energia Sec / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="custoEnergiaSecCiclo" class="money-input text-right" value="2,88" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Custo Água / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="custoAguaCiclo" class="text-right" value="1,50" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Custo Energia Lav / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="custoEnergiaLavCiclo" class="text-right" value="0,23" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Custo Energia Sec / Ciclo (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="custoEnergiaSecCiclo" class="text-right" value="2,88" oninput="calcularTutto()"></div></div>
             </div>
 
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Tempo Lavagem (min) - mínimo 30</label><input type="number" id="tempoLav" value="30" min="30" step="1" oninput="validarTempos(); calcularTudo()"></div>
-                <div class="form-group"><label>Tempo Secagem (min) - mínimo 40</label><input type="number" id="tempoSec" value="40" min="40" step="1" oninput="validarTempos(); calcularTudo()"></div>
-                <div class="form-group"><label>Dias Funcionamento / Mês</label><input type="number" id="diasMes" value="30" min="1" max="31" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Tempo Lavagem (min) - mínimo 30</label><input type="number" id="tempoLav" value="30" min="30" step="1" oninput="validarTempos(); calcularTutto()"></div>
+                <div class="form-group"><label>Tempo Secagem (min) - mínimo 40</label><input type="number" id="tempoSec" value="40" min="40" step="1" oninput="validarTempos(); calcularTutto()"></div>
+                <div class="form-group"><label>Dias Funcionamento / Mês</label><input type="number" id="diasMes" value="30" min="1" max="31" oninput="calcularTutto()"></div>
             </div>
             
             <div class="grid-3" style="margin-bottom: 20px;">
@@ -191,19 +191,19 @@
                     <label>Galão Sabão (R$) / Vol.</label>
                     <div class="input-group">
                         <span class="input-prefix">R$</span>
-                        <input type="text" inputmode="decimal" id="precoSabao" class="money-input text-right input-compact" value="25,00" oninput="formatInputNumber(event); calcularTudo()">
-                        <select id="volumeSabao" class="select-compact" onchange="calcularTudo()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
+                        <input type="text" id="precoSabao" class="text-right input-compact" value="25,00" oninput="calcularTutto()">
+                        <select id="volumeSabao" class="select-compact" onchange="calcularTutto()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Galão Amaciante (R$) / Vol.</label>
                     <div class="input-group">
                         <span class="input-prefix">R$</span>
-                        <input type="text" inputmode="decimal" id="precoAmac" class="money-input text-right input-compact" value="30,00" oninput="formatInputNumber(event); calcularTudo()">
-                        <select id="volumeAmac" class="select-compact" onchange="calcularTudo()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
+                        <input type="text" id="precoAmac" class="text-right input-compact" value="30,00" oninput="calcularTutto()">
+                        <select id="volumeAmac" class="select-compact" onchange="calcularTutto()"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select>
                     </div>
                 </div>
-                <div class="form-group"><label>ml Químicos (Soma S+A)</label><input type="number" id="mlQuimicos" value="65" min="0" step="5" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>ml Químicos (Soma S+A)</label><input type="number" id="mlQuimicos" value="65" min="0" step="5" oninput="calcularTutto()"></div>
             </div>
             
             <div class="ml-group">
@@ -219,8 +219,8 @@
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-gears"></i>2. Capacidade Operacional <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3">
-                <div class="form-group"><label>Nº de Lavadoras</label><input type="number" id="numLavadoras" value="1" min="1" oninput="validarCapacidade(); calcularTudo();"></div>
-                <div class="form-group"><label>Nº de Secadoras</label><input type="number" id="numSecadoras" value="1" min="1" oninput="validarCapacidade(); calcularTudo();"></div>
+                <div class="form-group"><label>Nº de Lavadoras</label><input type="number" id="numLavadoras" value="1" min="1" oninput="validarCapacidade(); calcularTutto();"></div>
+                <div class="form-group"><label>Nº de Secadoras</label><input type="number" id="numSecadoras" value="1" min="1" oninput="validarCapacidade(); calcularTutto();"></div>
             </div>
             <div id="alertaCapacidade" class="alert-text"></div>
         </div>
@@ -231,18 +231,18 @@
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-file-invoice-dollar"></i>3. Custos Fixos e Impostos <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Aluguel</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="aluguel" class="money-input text-right" value="2.500,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Internet + Sistema</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="internet" class="money-input text-right" value="150,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Câmeras / Segurança</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="seguranca" class="money-input text-right" value="200,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Aluguel</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="aluguel" class="text-right" value="2.500,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Internet + Sistema</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="internet" class="text-right" value="150,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Câmeras / Segurança</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="seguranca" class="text-right" value="200,00" oninput="calcularTutto()"></div></div>
             </div>
             <div class="grid-3" style="margin-bottom: 20px;">
-                <div class="form-group"><label>Energia Ar-Cond. 24h</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="arCond" class="money-input text-right" value="600,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Manutenção / Outros</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="manutencao" class="money-input text-right" value="300,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Impostos (%)</label><input type="number" id="impostos" value="8" step="0.5" min="0" max="100" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Energia Ar-Cond. 24h</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="arCond" class="text-right" value="600,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Manutenção / Outros</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="manutencao" class="text-right" value="300,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Impostos (%)</label><input type="number" id="impostos" value="8" step="0.5" min="0" max="100" oninput="calcularTutto()"></div>
             </div>
             <div class="grid-2">
-                <div class="form-group"><label>Contador</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="contador" class="money-input text-right" value="350,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Software Totem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="softwareTotem" class="money-input text-right" value="300,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Contador</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="contador" class="text-right" value="350,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Software Totem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="softwareTotem" class="text-right" value="300,00" oninput="calcularTutto()"></div></div>
             </div>
         </div>
     </div>
@@ -252,8 +252,8 @@
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-clock-rotate-left"></i>4. Depreciação <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-2">
-                <div class="form-group"><label>Valor Máquinas</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorMaquinas" class="money-input text-right" value="50.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Vida Útil (meses)</label><input type="number" id="vidaUtil" value="120" step="12" min="1" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Valor Máquinas</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="valorMaquinas" class="text-right" value="50.000,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Vida Útil (meses)</label><input type="number" id="vidaUtil" value="120" step="12" min="1" oninput="calcularTutto()"></div>
             </div>
         </div>
     </div>
@@ -263,9 +263,9 @@
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-landmark"></i>5. Financiamento <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-3">
-                <div class="form-group"><label>Valor Financiado</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorFinanciado" class="money-input text-right" value="0,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Taxa Juros Mensal (%)</label><input type="number" id="taxaJuros" value="1.5" step="0.1" min="0" oninput="calcularTudo()"></div>
-                <div class="form-group"><label>Nº Parcelas</label><input type="number" id="numParcelas" value="24" step="1" min="1" oninput="calcularTudo()"></div>
+                <div class="form-group"><label>Valor Financiado</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="valorFinanciado" class="text-right" value="0,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Taxa Juros Mensal (%)</label><input type="number" id="taxaJuros" value="1.5" step="0.1" min="0" oninput="calcularTutto()"></div>
+                <div class="form-group"><label>Nº Parcelas</label><input type="number" id="numParcelas" value="24" step="1" min="1" oninput="calcularTutto()"></div>
             </div>
         </div>
     </div>
@@ -275,8 +275,8 @@
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-piggy-bank"></i>6. Investimento Inicial <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
             <div class="grid-2">
-                <div class="form-group"><label>Investimento Total</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="investimentoInicial" class="money-input text-right" value="80.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <div class="form-group"><label>Valor Residual</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valorResidual" class="money-input text-right" value="20.000,00" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Investimento Total</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="investimentoInicial" class="text-right" value="80.000,00" oninput="calcularTutto()"></div></div>
+                <div class="form-group"><label>Valor Residual</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="valorResidual" class="text-right" value="20.000,00" oninput="calcularTutto()"></div></div>
             </div>
         </div>
     </div>
@@ -353,57 +353,6 @@
     };
     const inputIds = Object.keys(defaultValues);
 
-    // --- NOVA FUNÇÃO DE FORMATAÇÃO AUTOMÁTICA BRL ---
-    function formatInputNumber(event) {
-        let input = event.target;
-        let value = input.value;
-
-        // Remove pontos de milhar existentes para evitar conflitos
-        value = value.replace(/\./g, "");
-
-        // Separa parte inteira e decimal se houver vírgula
-        let parts = value.split(',');
-
-        // Parte Inteira (antes da vírgula)
-        let intPart = parts[0];
-        // Remove tudo que não é dígito da parte inteira
-        intPart = intPart.replace(/\D/g, "");
-        if (intPart === "") intPart = "0";
-        // Adiciona pontos de milhar
-        intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-        // Parte Decimal (depois da vírgula)
-        let decPart = parts[1] || "";
-        // Remove tudo que não é dígito da parte decimal
-        decPart = decPart.replace(/\D/g, "");
-        // Limita a 2 casas decimais
-        if (decPart.length > 2) decPart = decPart.slice(0, 2);
-
-        // Reconstrói o valor
-        if (decPart.length > 0) {
-            input.value = intPart + "," + decPart;
-        } else {
-            input.value = intPart;
-        }
-    }
-    // -------------------------------------------------
-
-    function formatAllMoneyInputs() {
-        document.querySelectorAll('.money-input').forEach(input => {
-            if (input.value) {
-                // Simula um evento para formatar o valor inicial carregado
-                formatInputNumber({ target: input });
-            }
-        });
-    }
-
-    function validarTempos() {
-        let tempoLav = parseInt(document.getElementById('tempoLav').value);
-        let tempoSec = parseInt(document.getElementById('tempoSec').value);
-        if (tempoLav < 30) document.getElementById('tempoLav').value = 30;
-        if (tempoSec < 40) document.getElementById('tempoSec').value = 40;
-    }
-
     function salvarDados() { 
         try { 
             const dados = {}; 
@@ -411,22 +360,19 @@
                 const el = document.getElementById(id); 
                 if (el) dados[id] = el.value; 
             }); 
-            localStorage.setItem('simuladorLavProV2', JSON.stringify(dados)); 
+            localStorage.setItem('simuladorLavProV3', JSON.stringify(dados)); 
         } catch (e) {} 
     }
 
     function carregarDados() { 
         try { 
-            const d = localStorage.getItem('simuladorLavProV2'); 
+            const d = localStorage.getItem('simuladorLavProV3'); 
             if (d) { 
                 const dados = JSON.parse(d); 
                 inputIds.forEach(id => { 
                     const el = document.getElementById(id); 
                     if (el && dados[id] !== undefined) el.value = dados[id]; 
                 }); 
-                formatAllMoneyInputs();
-            } else {
-                formatAllMoneyInputs();
             }
         } catch (e) {} 
     }
@@ -436,8 +382,7 @@
             const el = document.getElementById(id); 
             if (el && defaultValues[id] !== undefined) el.value = defaultValues[id]; 
         }); 
-        formatAllMoneyInputs();
-        calcularTudo(); 
+        calcularTutto(); 
         salvarDados(); 
     }
 
@@ -446,12 +391,13 @@
         if (!el) return defaultValue;
         let valStr = el.value.trim();
         
-        if (el.classList.contains('money-input')) {
-            // Remove pontos de milhar e troca vírgula decimal por ponto
-            valStr = valStr.replace(/\./g, '').replace(',', '.');
-        } else {
-            valStr = valStr.replace(',', '.');
-        }
+        if (valStr === "") return defaultValue;
+
+        // Lógica robusta para entrada manual:
+        // 1. Remove pontos (milhar) caso o usuário tenha digitado "1.000"
+        valStr = valStr.replace(/\./g, "");
+        // 2. Troca vírgula por ponto (decimal)
+        valStr = valStr.replace(",", ".");
         
         let v = parseFloat(valStr);
         return (isNaN(v) || v < 0) ? defaultValue : v;
@@ -460,6 +406,13 @@
     function formatCurrency(value) { 
         if (isNaN(value) || !isFinite(value)) return "R$ 0,00"; 
         return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); 
+    }
+
+    function validarTempos() {
+        let tempoLav = parseInt(document.getElementById('tempoLav').value);
+        let tempoSec = parseInt(document.getElementById('tempoSec').value);
+        if (tempoLav < 30) document.getElementById('tempoLav').value = 30;
+        if (tempoSec < 40) document.getElementById('tempoSec').value = 40;
     }
 
     function calcularParcelaFinanciamento(valor, taxaMensal, numParcelas) { 
@@ -494,16 +447,23 @@
         const volumeAmacLitros = parseFloat(document.getElementById('volumeAmac')?.value) || 7; 
         const mlQuimicos = getValor('mlQuimicos');
 
-        const custoSabaoPorMl = precoSabao / (volumeSabaoLitros * 1000); 
-        const custoAmacPorMl = precoAmac / (volumeAmacLitros * 1000);
-        const custoMedioMl = (custoSabaoPorMl + custoAmacPorMl) / 2;
-        const custoQuimicosCiclo = mlQuimicos * custoMedioMl;
+        // CORREÇÃO CONTÁBIL
+        const custoTotalQuimicos = precoSabao + precoAmac;
+        const volumeTotalLitros = volumeSabaoLitros + volumeAmacLitros;
+        
+        let custoPorLitro = 0;
+        if (volumeTotalLitros > 0) {
+            custoPorLitro = custoTotalQuimicos / volumeTotalLitros;
+        }
+        
+        const custoPorMl = custoPorLitro / 1000;
+        const custoQuimicosCiclo = mlQuimicos * custoPorMl;
         
         document.getElementById('custoQuimicosDisplay').innerText = formatCurrency(custoQuimicosCiclo);
         return custoQuimicosCiclo;
     }
 
-    function calcularTudo() {
+    function calcularTutto() {
         try {
             validarTempos();
             const custoQuimicosCiclo = atualizarCustosQuimicos();
@@ -656,7 +616,7 @@
     document.getElementById('btnReset').addEventListener('click', resetarPadrao);
     
     carregarDados(); 
-    setTimeout(calcularTudo, 100);
+    setTimeout(calcularTutto, 100);
 </script>
 </body>
 </html>
