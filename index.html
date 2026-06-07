@@ -133,7 +133,7 @@
 <body>
 <div class="container" id="relatorioContainer">
     <h1><i class="fa-solid fa-computer"></i> Simulador Financeiro Pro - 24h</h1>
-    <p class="subtitle">Cálculo por Custos Diretos (Corrigido) | Tempos mínimos: Lavagem 30min / Secagem 40min</p>
+    <p class="subtitle">Cálculo por Custos Diretos | Formatação Automática BRL</p>
 
     <!-- 1. DADOS OPERACIONAIS POR TURNO -->
     <div class="card">
@@ -353,26 +353,46 @@
     };
     const inputIds = Object.keys(defaultValues);
 
+    // --- NOVA FUNÇÃO DE FORMATAÇÃO AUTOMÁTICA BRL ---
     function formatInputNumber(event) {
-        let input = event.target; 
-        input.value = input.value.replace('.', ',');
+        let input = event.target;
         let value = input.value;
-        value = value.replace(/[^\d,]/g, '');
+
+        // Remove pontos de milhar existentes para evitar conflitos
+        value = value.replace(/\./g, "");
+
+        // Separa parte inteira e decimal se houver vírgula
         let parts = value.split(',');
-        if (parts.length > 2) {
-            value = parts[0] + ',' + parts.slice(1).join('');
-            parts = value.split(',');
+
+        // Parte Inteira (antes da vírgula)
+        let intPart = parts[0];
+        // Remove tudo que não é dígito da parte inteira
+        intPart = intPart.replace(/\D/g, "");
+        if (intPart === "") intPart = "0";
+        // Adiciona pontos de milhar
+        intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        // Parte Decimal (depois da vírgula)
+        let decPart = parts[1] || "";
+        // Remove tudo que não é dígito da parte decimal
+        decPart = decPart.replace(/\D/g, "");
+        // Limita a 2 casas decimais
+        if (decPart.length > 2) decPart = decPart.slice(0, 2);
+
+        // Reconstrói o valor
+        if (decPart.length > 0) {
+            input.value = intPart + "," + decPart;
+        } else {
+            input.value = intPart;
         }
-        let intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        input.value = parts.length === 2 ? intPart + ',' + parts[1] : intPart;
-        if (event.type !== 'reset') calcularTudo();
     }
+    // -------------------------------------------------
 
     function formatAllMoneyInputs() {
         document.querySelectorAll('.money-input').forEach(input => {
             if (input.value) {
-                input.value = input.value.replace('.', ','); 
-                formatInputNumber({ target: input, type: 'load' });
+                // Simula um evento para formatar o valor inicial carregado
+                formatInputNumber({ target: input });
             }
         });
     }
@@ -421,19 +441,15 @@
         salvarDados(); 
     }
 
-    // FUNÇÃO CORRIGIDA DE LEITURA DE VALORES
     function getValor(id, defaultValue = 0) {
         const el = document.getElementById(id); 
         if (!el) return defaultValue;
         let valStr = el.value.trim();
         
-        // Se for um campo monetário (texto), removemos pontos de milhar e trocamos vírgula por ponto
         if (el.classList.contains('money-input')) {
+            // Remove pontos de milhar e troca vírgula decimal por ponto
             valStr = valStr.replace(/\./g, '').replace(',', '.');
         } else {
-            // Se for um campo numérico comum (taxa juros, quantidade, etc)
-            // Trocamos vírgula por ponto (caso usuário use vírgula decimal)
-            // NÃO removemos pontos, pois podem ser decimais (ex: 1.5% de juros)
             valStr = valStr.replace(',', '.');
         }
         
@@ -450,7 +466,6 @@
         if (valor <= 0 || numParcelas <= 0) return 0; 
         if (taxaMensal <= 0) return valor / numParcelas; 
         
-        // Fórmula Price: PMT = P * [ i(1+i)^n ] / [ (1+i)^n – 1 ]
         const i = taxaMensal / 100; 
         return valor * (i * Math.pow(1 + i, numParcelas)) / (Math.pow(1 + i, numParcelas) - 1); 
     }
