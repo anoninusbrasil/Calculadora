@@ -145,7 +145,6 @@
             </div>
             <div class="grid-3" style="margin-bottom: 20px;">
                 <div class="form-group"><label>Tarifa Água (R$/m³)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="tarifaAgua" value="6,50" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
-                <!-- CAMPOS TYPE NUMBER NÃO RECEBEM MÁSCARA -->
                 <div class="form-group"><label>Água por Lavagem (m³)</label><input type="number" id="aguaLav" value="0.150" step="0.001" min="0" oninput="calcularTudo()"></div>
                 <div class="form-group"><label>Energia Lavagem (kWh)</label><input type="number" id="energiaLav" value="0.20" step="0.01" min="0" oninput="calcularTudo()"></div>
             </div>
@@ -189,6 +188,7 @@
         </div>
     </div>
 
+    <!-- CUSTOS FIXOS ATUALIZADO -->
     <div class="card">
         <h2 class="card-title" onclick="toggleCard(this)"><i class="fa-solid fa-file-invoice-dollar"></i>3. Custos Fixos e Impostos <i class="fa-solid fa-chevron-down toggle-icon"></i></h2>
         <div class="card-content">
@@ -197,10 +197,15 @@
                 <div class="form-group"><label>Internet + Sistema</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="internet" value="150,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
                 <div class="form-group"><label>Câmeras / Segurança</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="seguranca" value="200,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
             </div>
-            <div class="grid-3">
+            <div class="grid-3" style="margin-bottom: 20px;">
                 <div class="form-group"><label>Energia Ar-Cond. 24h</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="arCond" value="600,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
                 <div class="form-group"><label>Manutenção / Outros</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="manutencao" value="300,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
                 <div class="form-group"><label>Impostos (% Faturamento)</label><input type="number" id="impostos" value="8" step="0.5" min="0" max="100" oninput="calcularTudo()"></div>
+            </div>
+            <!-- NOVOS CAMPOS ADICIONADOS AQUI -->
+            <div class="grid-2">
+                <div class="form-group"><label>Contador (Mensalidade ME/Simples)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="contador" value="350,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
+                <div class="form-group"><label>Sistemas e Software do Totem</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="softwareTotem" value="300,00" class="text-right" oninput="formatInputNumber(event); calcularTudo()"></div></div>
             </div>
         </div>
     </div>
@@ -293,8 +298,8 @@
         tarifaAgua:'6,50', aguaLav:0.150, energiaLav:0.20, energiaSec:2.50, precoSabao:'25,00', volumeSabao:'7',
         precoAmac:'30,00', volumeAmac:'7', mlSabao:40, mlAmac:25, numLavadoras:1, numSecadoras:1,
         diasMes:30, aluguel:'2.500,00', internet:'150,00', seguranca:'200,00', arCond:'600,00', manutencao:'300,00',
-        impostos:8, valorMaquinas:'50.000,00', vidaUtil:120, valorFinanciado:'0,00', taxaJuros:1.5,
-        numParcelas:24, investimentoInicial:'80.000,00', valorResidual:'20.000,00'
+        impostos:8, contador:'350,00', softwareTotem:'300,00', valorMaquinas:'50.000,00', vidaUtil:120, 
+        valorFinanciado:'0,00', taxaJuros:1.5, numParcelas:24, investimentoInicial:'80.000,00', valorResidual:'20.000,00'
     };
     const inputIds = Object.keys(defaultValues);
 
@@ -331,13 +336,12 @@
             const el = document.getElementById(id); 
             if (el && defaultValues[id] !== undefined) {
                 el.value = defaultValues[id];
-                if (el.type === 'text') formatInputNumber({ target: el }); // Garante máscara no reset
+                if (el.type === 'text') formatInputNumber({ target: el });
             }
         });
         calcularTudo(); salvarDados();
     }
 
-    // CORREÇÃO CRÍTICA: Diferencia campo moeda (texto) de campo decimal (número)
     function getValor(id, defaultValue = 0) {
         const el = document.getElementById(id);
         if (!el) return defaultValue;
@@ -345,12 +349,10 @@
         let valStr = el.value;
         let v;
 
-        // Se for campo texto formatado (R$ 1.500,00), limpa pontos e troca vírgula
         if (el.type === 'text') {
             valStr = valStr.replace(/\./g, ''); 
             valStr = valStr.replace(',', '.');   
         } 
-        // Se for tipo número (0.150), o navegador já manda formato americano, não mexe!
         
         v = parseFloat(valStr);
         return (isNaN(v) || v < 0) ? defaultValue : v;
@@ -408,6 +410,9 @@
             const aluguel = getValor('aluguel'); const internet = getValor('internet'); const seguranca = getValor('seguranca');
             const arCond = getValor('arCond'); const manutencao = getValor('manutencao');
             let impostosPerc = getValor('impostos', 8) / 100; impostosPerc = Math.min(impostosPerc, 1);
+            // NOVOS CUSTOS FIXOS LIDOS AQUI
+            const contador = getValor('contador'); const softwareTotem = getValor('softwareTotem');
+            
             const valorMaquinas = getValor('valorMaquinas'); const vidaUtil = getValor('vidaUtil', 120);
             const depreciacaoMensal = vidaUtil > 0 ? valorMaquinas / vidaUtil : 0;
             const valorFinanciado = getValor('valorFinanciado'); const taxaJuros = getValor('taxaJuros'); const numParcelas = getValor('numParcelas', 1);
@@ -427,7 +432,9 @@
             const custoVarMes = custoVarDiaTotal * diasMes;
             const lucroBrutoMes = receitaMes - custoVarMes;
             const impostosMes = receitaMes * impostosPerc;
-            const custosFixosMes = aluguel + internet + seguranca + arCond + manutencao;
+            // ADICIONADOS CONTADOR E SOFTWARE TOTEM AQUI
+            const custosFixosMes = aluguel + internet + seguranca + arCond + manutencao + contador + softwareTotem;
+            
             const lucroOperacionalMes = lucroBrutoMes - impostosMes - custosFixosMes;
             const lucroLiquidoMes = lucroOperacionalMes - depreciacaoMensal - parcelaFinanc;
             const saldoCaixaReal = lucroLiquidoMes + depreciacaoMensal;
