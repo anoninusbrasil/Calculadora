@@ -208,8 +208,8 @@
                 </div>
             </div>
             <div class="grid-4" style="margin: 20px 0;">
-                <div class="form-group"><label>Nº Lavadoras</label><input type="number" id="numLavadoras" value="1" min="1"></div>
-                <div class="form-group"><label>Nº Secadoras</label><input type="number" id="numSecadoras" value="3" min="3"></div>
+                <div class="form-group"><label>Nº Lavadoras</label><input type="number" id="numLavadoras" value="3" min="1"></div>
+                <div class="form-group"><label>Nº Secadoras</label><input type="number" id="numSecadoras" value="3" min="1"></div>
                 <div class="form-group"><label>Tempo Lavagem (min)</label><input type="number" id="tempoLav" class="input-time" value="30" min="30" step="1"></div>
                 <div class="form-group"><label>Tempo Secagem (min)</label><input type="number" id="tempoSec" class="input-time" value="45" min="45" step="1"></div>
             </div>
@@ -222,7 +222,7 @@
                 <div class="form-group"><label>Sabão (R$/galão)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoSabao" class="text-right input-compact" value="107,00"><select id="volumeSabao" class="select-compact"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select></div></div>
                 <div class="form-group"><label>Amaciante (R$/galão)</label><div class="input-group"><span class="input-prefix">R$</span><input type="text" id="precoAmac" class="text-right input-compact" value="107,00"><select id="volumeAmac" class="select-compact"><option value="5">5L</option><option value="7" selected>7L</option><option value="10">10L</option><option value="20">20L</option></select></div></div>
                 <div class="form-group"><label>ml Sabão / Ciclo</label><input type="number" id="mlSabao" value="40" min="0" step="5"></div>
-                <div class="form-group"><label>ml Amaciante / Ciclo</label><input type="number" id="mlAmac" value="25" min="0" step="5"></div>
+                <div class="form-group"><label>ml Amaciante / Ciclo</label><input type="number" id="mlAmac" value="30" min="0" step="5"></div>
             </div>
             <div class="ml-group">
                 <div class="custo-ml"><strong>Custo Variável / Ciclo:</strong> <span id="custoVarDisplay">R$ 0,00</span></div>
@@ -301,6 +301,7 @@
     <div class="kpi-grid" id="kpiGrid">
         <div class="kpi-card"><h3>Fluxo de Caixa Mensal</h3><div class="big-number" id="kpiFluxo">R$ 0</div><div class="kpi-sub">Disponível</div></div>
         <div class="kpi-card"><h3>Ponto de Equilíbrio</h3><div class="big-number" id="kpiBreakEven">0 / 0</div><div class="kpi-sub">Lav/Sec por dia</div></div>
+        <div class="kpi-card"><h3>Clientes/dia no Equilíbrio</h3><div class="big-number" id="kpiClientesBE">0</div><div class="kpi-sub">Cada cliente: 1 Lav + 1 Sec</div></div>
         <div class="kpi-card"><h3>Ticket Médio</h3><div class="big-number" id="kpiTicket">R$ 0</div><div class="kpi-sub">Por ciclo</div></div>
         <div class="kpi-card"><h3>Payback</h3><div class="big-number" id="kpiPayback">0 meses</div><div class="kpi-sub">Retorno</div></div>
         <div class="kpi-card"><h3>Produtividade</h3><div class="big-number" id="kpiProdutividade">0%</div><div class="kpi-sub">Capacidade usada</div></div>
@@ -344,8 +345,8 @@
         precoLavCoruja:'13,00', precoSecCoruja:'13,00', ocupCoruja:10,
         custoAguaCiclo:'1,50', custoEnergiaLavCiclo:'1,50', custoEnergiaSecCiclo:'3,50',
         tempoLav:30, tempoSec:45,
-        precoSabao:'107,00', volumeSabao:'7', precoAmac:'107,00', volumeAmac:'7', mlSabao:40, mlAmac:25,
-        numLavadoras:1, numSecadoras:3,
+        precoSabao:'107,00', volumeSabao:'7', precoAmac:'107,00', volumeAmac:'7', mlSabao:40, mlAmac:30,
+        numLavadoras:3, numSecadoras:3,
         aluguel:'2.500,00', internet:'150,00', seguranca:'200,00', arCond:'600,00', manutencao:'300,00', impostos:8,
         contador:'350,00', softwareTotem:'300,00',
         valorMaquinas:'100.000,00', vidaUtil:120, valorFinanciado:'0,00', taxaJuros:1.5, numParcelas:24,
@@ -469,6 +470,8 @@
             let beLav = beSec * ratio;
             let beValid = isFinite(beSec) && beSec>0;
 
+            let clientesPorDiaBE = beValid ? Math.ceil(beLav) : 0;
+
             document.getElementById('dreReceitaBruta').innerText = formatCurrency(receitaBrutaMes);
             document.getElementById('dreCustosVar').innerText = formatCurrency(custoVarMes);
             document.getElementById('dreMargemContrib').innerText = formatCurrency(margemContrib);
@@ -485,6 +488,7 @@
             document.getElementById('contextoCiclos').innerHTML = `Receita ${formatCurrency(receitaBrutaMes)} equivalente a ${Math.round(ciclosCompletos)} ciclos completos/mês. Média diária: ${Math.round(ciclosCompletos/diasMes)} ciclos/dia.`;
             document.getElementById('kpiFluxo').innerText = formatCurrency(fluxoCaixa);
             document.getElementById('kpiBreakEven').innerHTML = beValid ? `${Math.ceil(beLav)} / ${Math.ceil(beSec)}` : "Inviável";
+            document.getElementById('kpiClientesBE').innerText = beValid ? clientesPorDiaBE : "-";
             document.getElementById('kpiTicket').innerText = formatCurrency(ticketMedio);
             document.getElementById('kpiPayback').innerText = isFinite(payback) ? Math.ceil(payback)+" meses" : "Inv";
             document.getElementById('kpiProdutividade').innerText = eficiencia.toFixed(1)+"%";
@@ -554,6 +558,7 @@
         linhas.push(['Payback (meses)', document.getElementById('kpiPayback').innerText]);
         linhas.push(['VPL (60 meses)', document.getElementById('kpiVPL').innerText]);
         linhas.push(['TIR', document.getElementById('kpiTIR').innerText]);
+        linhas.push(['Clientes/dia no Equilíbrio', document.getElementById('kpiClientesBE').innerText]);
         let csv = linhas.map(row => row.join(';')).join('\n');
         let blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
         let link = document.createElement('a');
